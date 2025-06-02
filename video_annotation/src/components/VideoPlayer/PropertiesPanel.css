@@ -1,0 +1,47 @@
+.properties-panel {
+  padding: 15px;
+  background-color: #f0f0f0;
+  border-bottom: none; /* Remove border if it was for stacking */
+  border-right: 1px solid #ccc; /* Add border between panel and list */
+  height: 250px; /* Example fixed height for this section */
+  overflow-y: auto; /* Allow scroll if content is tall */
+  flex-basis: 40%; /* Example: 40% width for properties */
+  flex-shrink: 0; /* Don't shrink */
+  color: #222; /* Darker base text color for the panel */
+}
+
+.properties-panel h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #000; /* Ensure heading is black */
+}
+
+.properties-panel p {
+  margin: 5px 0;
+  font-size: 0.9em;
+  /* color: inherit; Already inherits from .properties-panel */
+}
+
+.properties-panel label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 3px;
+  font-size: 0.85em;
+  font-weight: bold;
+  /* color: inherit; */
+}
+
+.properties-panel input[type="number"],
+.properties-panel textarea {
+  width: calc(100% - 10px);
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 0.9em;
+  color: #000; /* Ensure input text is black */
+}
+
+.properties-panel textarea {
+  resize: vertical;
+  min-height: 40px;
+} 

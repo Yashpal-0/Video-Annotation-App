@@ -1,0 +1,114 @@
+.annotation-list {
+  padding: 15px;
+  background-color: #f8f8f8;
+  flex-grow: 1; /* Allow list to take remaining space in sidebar */
+  overflow-y: auto; /* Scroll if list is long */
+  min-height: 100px; /* Ensure it has some height */
+}
+
+.annotation-list h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.annotation-list ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.annotation-list li {
+  padding: 8px 5px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 0.85em;
+  color: #222; /* Dark base color for list items */
+}
+
+.annotation-list li:hover {
+  background-color: #e9e9e9;
+}
+
+.annotation-list li.selected {
+  background-color: #d0eaff;
+  font-weight: bold;
+  color: #000; /* Ensure selected item text is black for contrast */
+}
+
+.annotation-list .ann-type {
+  display: inline-block;
+  min-width: 60px; /* For type like 'Rect' or 'Circle' */
+  font-weight: bold;
+  margin-right: 5px;
+  text-transform: capitalize;
+  /* color: inherit; */ /* Will inherit from li */
+}
+
+.annotation-list .ann-time {
+  color: #111; /* Even darker gray / off-black */
+  margin-right: 5px;
+}
+
+.annotation-list .ann-preview {
+  color: #333; /* Darker gray for preview */
+  font-style: italic;
+}
+
+/* Styles for the overall workspace layout */
+.video-annotation-workspace {
+  display: flex;
+  flex-direction: column; /* Stack player area and annotation section vertically */
+  height: 100vh; 
+  background-color: #e0e0e0;
+}
+
+.video-player-main-area {
+  /* flex-grow: 1; */ /* This might not be needed if bottom section has fixed/auto height */
+  /* Let video player define its own height based on content or specific CSS */
+  display: flex;
+  flex-direction: column; /* Stack player and controls */
+  /* background-color: #333; */ /* For visualizing the area */
+  position: relative; /* For fullscreen video to cover this area */
+}
+
+.video-player-main-area.fullscreen-video-area {
+    position: fixed; /* Take up whole screen */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100; /* Ensure it's above everything when fullscreen */
+}
+
+/* The actual video player container already handles its fullscreen logic */
+
+.video-annotation-bottom-section { /* Renamed from video-annotation-sidebar */
+  width: 100%; /* Take full width */
+  /* min-width: 250px; */ /* No longer relevant for width */
+  display: flex; /* Arrange PropertiesPanel and AnnotationList side-by-side or vertically */
+  flex-direction: row; /* Default: Properties and List side-by-side */ 
+  /* Or use flex-direction: column; if you want them stacked within the bottom bar */
+  background-color: #f0f0f0;
+  border-top: 1px solid #ccc; /* Was border-left */
+  /* height: 300px; */ /* Example fixed height, or use flex-grow on children */
+  /* overflow-y: auto; */ /* May not be needed here if children handle their own scroll */
+  padding: 0; /* Remove padding if children have their own */
+}
+
+/* Adjust PropertiesPanel and AnnotationList to fit side-by-side in the bottom section */
+.properties-panel {
+  /* ... existing styles ... */
+  flex-basis: 40%; /* Example: 40% width for properties */
+  flex-shrink: 0; /* Don't shrink */
+  border-bottom: none; /* Remove border if it was for stacking */
+  border-right: 1px solid #ccc; /* Add border between panel and list */
+  overflow-y: auto; /* Allow scroll if content is tall */
+  height: 250px; /* Example fixed height for this section */
+}
+
+.annotation-list {
+  /* ... existing styles ... */
+  flex-grow: 1; /* List takes remaining space */
+  height: 250px; /* Example fixed height, match properties panel */
+  overflow-y: auto;
+} 

@@ -1,0 +1,26 @@
+.video-player-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px; /* Adjust as needed */
+  background-color: #000;
+}
+
+.video-player {
+  width: 100%;
+  display: block; /* Removes extra space below video */
+}
+
+.video-player-container.fullscreen {
+  max-width: none;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.video-player-container.fullscreen .video-player {
+  height: 100%;
+  object-fit: contain;
+} 

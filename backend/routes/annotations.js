@@ -2,64 +2,77 @@ const express = require('express');
 const router = express.Router();
 const Annotation = require('../models/Annotation');
 
-// GET /api/annotations?video=VIDEO_ID
+// GET /api/annotations - Retrieve all annotations
 router.get('/', async (req, res) => {
   try {
-    const videoId = req.query.video || 'default';
-    const annos = await Annotation.find({ video: videoId });
-    res.json(annos);
+    // Later, you might add ?videoId=xyz to req.query to filter
+    const annotations = await Annotation.find().sort({ timestamp: 1 }); // Sort by timestamp
+    // Mongoose uses _id, frontend might use id. Let's map _id to id for consistency if needed by frontend.
+    res.json(annotations.map(ann => ({ ...ann.toObject(), id: ann._id })));
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error("Error fetching annotations:", err);
+    res.status(500).json({ message: 'Failed to retrieve annotations', error: err.message });
   }
 });
 
-// POST /api/annotations
+// POST /api/annotations - Create a new annotation
 router.post('/', async (req, res) => {
+  const annotationData = req.body;
+  // Remove frontend 'id' if present, MongoDB will generate _id
+  delete annotationData.id; 
+
   try {
-    const { type, x, y, w, h, timestamp, duration, color, text, video } =
-      req.body;
-    const newAnno = new Annotation({
-      type,
-      x,
-      y,
-      w,
-      h,
-      timestamp,
-      duration,
-      color,
-      text,
-      video: video || 'default'
-    });
-    const saved = await newAnno.save();
-    res.status(201).json(saved);
+    const newAnnotation = new Annotation(annotationData);
+    await newAnnotation.save();
+    res.status(201).json({ ...newAnnotation.toObject(), id: newAnnotation._id });
   } catch (err) {
-    res.status(400).json({ error: 'Invalid annotation data' });
+    console.error("Error creating annotation:", err);
+    if (err.name === 'ValidationError') {
+        return res.status(400).json({ message: 'Validation Error', errors: err.errors });
+    }
+    res.status(500).json({ message: 'Failed to create annotation', error: err.message });
   }
 });
 
-// PUT /api/annotations/:id
-router.put('/:id', async (req, res) => {
+// PUT /api/annotations/:id - Update an existing annotation
+router.put('/:mongoId', async (req, res) => {
+  const { mongoId } = req.params;
+  const updatedData = req.body;
+  // Prevent changing the ID via the body
+  delete updatedData._id;
+  delete updatedData.id; 
+
   try {
-    const updated = await Annotation.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
+    const updatedAnnotation = await Annotation.findByIdAndUpdate(
+      mongoId, 
+      updatedData, 
+      { new: true, runValidators: true } // Return the updated document and run schema validators
     );
-    if (!updated) return res.status(404).json({ error: 'Not found' });
-    res.json(updated);
+    if (!updatedAnnotation) {
+      return res.status(404).json({ message: 'Annotation not found.' });
+    }
+    res.json({ ...updatedAnnotation.toObject(), id: updatedAnnotation._id });
   } catch (err) {
-    res.status(400).json({ error: 'Invalid update data' });
+    console.error(`Error updating annotation ${mongoId}:`, err);
+    if (err.name === 'ValidationError') {
+        return res.status(400).json({ message: 'Validation Error', errors: err.errors });
+    }
+    res.status(500).json({ message: 'Failed to update annotation', error: err.message });
   }
 });
 
-// DELETE /api/annotations/:id
-router.delete('/:id', async (req, res) => {
+// DELETE /api/annotations/:id - Delete an annotation
+router.delete('/:mongoId', async (req, res) => {
+  const { mongoId } = req.params;
   try {
-    const deleted = await Annotation.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Not found' });
-    res.json({ message: 'Deleted successfully' });
+    const deletedAnnotation = await Annotation.findByIdAndDelete(mongoId);
+    if (!deletedAnnotation) {
+      return res.status(404).json({ message: 'Annotation not found.' });
+    }
+    res.status(204).send(); // No content
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error(`Error deleting annotation ${mongoId}:`, err);
+    res.status(500).json({ message: 'Failed to delete annotation', error: err.message });
   }
 });
 

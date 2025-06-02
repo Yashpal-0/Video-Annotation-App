@@ -1,0 +1,280 @@
+.controls-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* Background moved to ::before pseudo-element */
+  color: white;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Allow controls to wrap to the next line */
+  justify-content: center; /* Center items if they wrap */
+  padding: 8px 10px; /* Adjust padding if necessary */
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+  font-family: 'Roboto', 'Arial', sans-serif;
+  z-index: 20; /* Ensure controls are above AnnotationLayer */
+  /* pointer-events: none; REMOVED from container */
+}
+
+.controls-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 70%, transparent 100%);
+  z-index: -1; /* Position background behind control items but within container */
+  pointer-events: none; /* Make the background itself click-through */
+}
+
+.video-player-container:hover .controls-container,
+.video-player-container.paused .controls-container {
+  opacity: 1;
+}
+
+/* Remove the !important overrides for pointer-events on children, no longer needed */
+/* OLD CSS TO BE REMOVED:
+.controls-container > .control-button,
+.controls-container .control-button, 
+.controls-container .progress-bar-container .progress-bar,
+.controls-container .annotation-tools-group > .control-button {
+  pointer-events: auto !important; 
+}
+*/
+
+/* Ensure all direct children that are meant to be interactive have position: relative 
+   if they need to stack above the ::before, though typically not needed if ::before is z-index: -1 */
+.control-button,
+.progress-bar-container,
+.time-display,
+.annotation-tools-group {
+  position: relative; /* Ensures they are in a stacking context above the ::before pseudo-element */
+  pointer-events: auto; /* Explicitly set, though default for most */
+}
+
+.control-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  margin: 0 2px;
+  outline: none;
+  font-size: 1.8em;
+}
+
+.control-button:hover {
+  transform: scale(1.1);
+}
+
+/* New styles for progress bar container and buffered bar */
+.progress-bar-container {
+  flex-grow: 1;
+  margin: 0 15px;
+  position: relative; /* For positioning buffered bar and thumb correctly */
+  height: 14px; /* Make container taller to accommodate hover effect */
+  display: flex;
+  align-items: center;
+}
+
+.progress-bar-buffered {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5); /* Lighter than main track */
+  border-radius: 5px;
+  z-index: 1; /* Behind main progress bar input */
+  pointer-events: none; /* Allow clicks to go through to the input */
+}
+
+.progress-bar {
+  flex-grow: 1;
+  /* margin: 0 15px; */ /* Removed as it's on container now */
+  cursor: pointer;
+  height: 5px; /* Default height */
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+  outline: none; /* Remove default outline */
+  position: relative; /* Ensure thumb is above buffered bar */
+  z-index: 2; /* Above buffered bar */
+  transition: height 0.1s ease-in-out; /* Smooth height transition */
+}
+
+/* Make progress bar slightly taller and thumb more prominent on hover/focus */
+.progress-bar-container:hover .progress-bar,
+.progress-bar:focus {
+  height: 8px; /* Taller on hover/focus */
+}
+
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: #ff0000; /* YouTube red */
+  border-radius: 50%;
+  cursor: pointer;
+  border: none; /* Removed border, often looks cleaner */
+  /* margin-top: -4.5px; */ /* Re-adjust if needed based on new height */
+  transition: transform 0.1s ease-in-out; /* Smooth thumb scaling */
+}
+
+.progress-bar-container:hover .progress-bar::-webkit-slider-thumb,
+.progress-bar:focus::-webkit-slider-thumb {
+  transform: scale(1.2); /* Slightly larger thumb on hover/focus */
+  /* Ensure thumb is still centered if bar height changes */
+  /* margin-top: -3px; for 8px bar height, adjust as needed */
+}
+
+.progress-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: #ff0000;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+}
+
+.progress-bar-container:hover .progress-bar::-moz-range-thumb,
+.progress-bar:focus::-moz-range-thumb {
+  transform: scale(1.2);
+}
+
+.progress-bar::-ms-thumb {
+  width: 14px;
+  height: 14px;
+  background: #ff0000;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  /* margin-top: 0; For MS thumb, vertical centering is different */
+}
+
+.progress-bar-container:hover .progress-bar::-ms-thumb,
+.progress-bar:focus::-ms-thumb {
+  transform: scale(1.2);
+}
+
+.annotation-marker {
+  position: absolute;
+  /* Vertically center marker against the typical progress bar track height (5px or 8px) */
+  /* Let's try top positioning relative to the container's center */
+  top: 50%; 
+  transform: translate(-50%, -50%); /* Center both horizontally and vertically */
+  width: 3px; /* Make it slightly more visible */
+  height: 10px; /* Make them a bit taller */
+  background-color: yellow;
+  border-radius: 1px; /* Slightly rounded */
+  z-index: 3;
+  pointer-events: none;
+}
+
+.time-display {
+  font-size: 0.9em;
+  margin: 0 10px;
+  min-width: 90px;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .controls-container {
+    padding: 5px 8px;
+  }
+  .progress-bar {
+    margin: 0 8px;
+  }
+  .time-display {
+    font-size: 0.8em;
+    min-width: 75px;
+    margin: 0 5px;
+  }
+  .control-button {
+    font-size: 1.5em;
+    padding: 5px;
+  }
+}
+
+/* Icon specific styles */
+.control-icon {
+  width: 1em; /* Scale with button font-size */
+  height: 1em; /* Scale with button font-size */
+  display: block; /* Remove extra space below icon */
+}
+
+.smaller-icon {
+  width: 0.8em; /* Smaller than default control-icon */
+  height: 0.8em; /* Smaller than default control-icon */
+}
+
+/* Ensure buttons with only icons are sized appropriately */
+.play-pause-button,
+.fullscreen-button {
+  line-height: 0; /* Helps center icon if SVG has extra space */
+}
+
+.playback-speed-button {
+  font-size: 0.8em; /* Smaller text for speed indication */
+  min-width: 40px; /* Ensure enough space for "2x" */
+  padding: 6px 4px; /* Adjust padding */
+}
+
+.frame-step-button {
+  /* Keep similar to other icon buttons */
+  line-height: 0;
+}
+
+.undo-redo-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Annotation Tool Buttons */
+.annotation-tools-group {
+  display: flex;
+  align-items: center;
+  margin: 0 10px; /* Spacing from other control groups */
+  padding: 0 5px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.annotation-tool-button {
+  font-size: 0.9em; /* Adjust as needed */
+  min-width: 30px; /* Adjust for icon or text */
+  padding: 6px;
+  margin: 0 1px; /* Tighter spacing within the group */
+}
+
+.annotation-tool-button.active {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  transform: scale(1.05); /* Slightly more prominent */
+}
+
+.deselect-button {
+    color: #ffdddd; /* Light red to indicate clear/deselect */
+    font-weight: bold;
+}
+
+.deselect-button:hover {
+    color: #ff9999;
+}
+
+/* Adjust main controls container if annotation tools make it too wide */
+/* This is a placeholder, media queries for responsive layout will be important */
+@media (max-width: 768px) { /* Example breakpoint */
+  .annotation-tools-group {
+    margin: 0 5px;
+  }
+  .annotation-tool-button {
+    font-size: 0.8em;
+    min-width: 25px;
+    padding: 5px;
+  }
+} 

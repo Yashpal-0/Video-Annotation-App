@@ -1,0 +1,29 @@
+.annotation-layer-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* width and height will be set by inline styles to match video */
+  z-index: 10; /* Above video, below controls if controls overlap */
+  pointer-events: auto; /* Allow mouse events on the layer itself */
+}
+
+.annotation-svg {
+  width: 100%;
+  height: 100%;
+  cursor: crosshair; /* Default cursor for drawing area */
+}
+
+/* Specific cursors per tool can be added here if desired,
+   by adding a class to annotation-svg based on currentTool */
+.annotation-svg.tool-text {
+  cursor: text;
+}
+
+.annotation-text-input {
+  /* Styles moved to inline for now, can be extracted to classes */
+  font-family: Arial, sans-serif; /* Match SVG text font if possible */
+}
+
+.selected-annotation {
+  cursor: move;
+} 
